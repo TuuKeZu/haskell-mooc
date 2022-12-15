@@ -262,7 +262,8 @@ sumRights xs = foldr (\n sum -> case n of {Right n -> sum + n; Left _ -> sum}) 0
 --   multiCompose [(3*), (2^), (+1)] 0 ==> 6
 --   multiCompose [(+1), (2^), (3*)] 0 ==> 2
 
-multiCompose fs = todo
+multiCompose :: [a -> a] -> a -> a 
+multiCompose fs i = foldr (\f a -> f a) i fs
 
 ------------------------------------------------------------------------------
 -- Ex 13: let's consider another way to compose multiple functions. Given
@@ -283,7 +284,7 @@ multiCompose fs = todo
 --   multiApp id [head, (!!2), last] "axbxc" ==> ['a','b','c'] i.e. "abc"
 --   multiApp sum [head, (!!2), last] [1,9,2,9,3] ==> 6
 
-multiApp = todo
+multiApp f fs x = f (map ($x) fs)
 
 ------------------------------------------------------------------------------
 -- Ex 14: in this exercise you get to implement an interpreter for a
@@ -317,5 +318,21 @@ multiApp = todo
 -- using (:). If you build the list in an argument to a helper
 -- function, the surprise won't work.
 
+interpret :: String -> Either [Int] (Either Int Int)
+interpret s = case s of
+    "up" -> Left [0, 1]
+    "down" -> Left [0, -1]
+    "left" -> Left [-1, 0]
+    "right" -> Left [1, 0]
+    "printY" -> Right (Right 0)
+    "printX" -> Right (Left 1)
+    _ -> Left [0, 0]
+
+add :: [Int] -> [Int] -> [Int]
+add as bs = zipWith (+) as bs
+
+run :: [String] -> ([Int], [String])
+run commands = foldr (\cmd (a, b) -> case (interpret cmd) of {Left n -> ((add a n), b); Right c -> case c of {Left _ -> (a, b ++ [show (head a)]); Right _ -> (a, b ++ [show (head (reverse a))])}}) ([0, 0], []) (reverse commands)
+
 interpreter :: [String] -> [String]
-interpreter commands = todo
+interpreter commands = snd (run commands)
