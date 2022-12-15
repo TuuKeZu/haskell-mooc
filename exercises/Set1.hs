@@ -148,5 +148,4 @@ power b n = b * power b (n - 1)
 
 ilog3 :: Integer -> Integer
 ilog3 0 = 0
-ilog3 3 = 1
-ilog3 n = n div 3
+ilog3 x = 1 + ilog3 (div x 3) 
